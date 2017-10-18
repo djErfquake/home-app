@@ -1,0 +1,19 @@
+{
+  "name": "home-app",
+  "version": "1.0.0",
+  "description": "weather, time, and calendar",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "postinstall": "sh post_install.sh"
+  },
+  "author": "Calvin LeVally",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "jquery": "^3.2.1",
+    "path": "^0.12.7",
+    "socket.io": "^2.0.3"
+  }
+}
