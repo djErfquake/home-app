@@ -1,5 +1,5 @@
 const Express = require('express');
-const Path = require('path');
+const path = require('path');
 const bodyParser = require('body-parser');
 
 const IP = process.env.IP || "127.0.0.1";
@@ -14,8 +14,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(Express.static('public'));
 
-let mainPageRouter = require(Path.join(__dirname, 'routes', 'mainPage.js'));
-let userRouting = require(Path.join(__dirname, 'routes', 'mainPage.js'));
+let mainPageRouter = require(path.join(__dirname, 'routes', 'mainPage.js'));
+let userRouting = require(path.join(__dirname, 'routes', 'mainPage.js'));
 app.use('/', mainPageRouter);
 app.use('/user', userRouting);
 
