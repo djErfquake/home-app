@@ -1,5 +1,5 @@
 const Express = require('express');
-const Path = require('Path');
+const Path = require('path');
 const bodyParser = require('body-parser');
 
 const IP = process.env.IP || "127.0.0.1";
