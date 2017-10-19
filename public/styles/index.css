@@ -1,5 +1,33 @@
 html {
-  font-family: 'Lato', sans-serif;
+  font-family: 'Lato', 'Arial', sans-serif;
   color: #FFFFFF;
   background-color: #000000;
+  font-weight: 300;
+  font-size: 20px;
+  text-rendering: optimizeLegibility;
+}
+
+.row {
+  max-width: 80%;
+  margin: 0 auto;
+}
+
+
+/* ----------------------------------------------- */
+/* WEATHER */
+/* ----------------------------------------------- */
+
+.temperature-container {
+  padding-top: 3vh;
+  display: flex;
+  justify-content: center;
+}
+
+.temperature-number {
+  margin-left: 3vw;
+  font-size: 23vh;
+}
+
+.temperature-icon {
+  font-size: 25vh;
 }
