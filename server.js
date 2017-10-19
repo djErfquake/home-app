@@ -2,7 +2,7 @@ const Express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 
-const IP = process.env.IP || "127.0.0.1";
+const IP = process.env.IP || "https://intense-mesa-59584.herokuapp.com/";
 const PORT = process.env.PORT || 8080;
 
 let app = Express();
