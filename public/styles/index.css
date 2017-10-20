@@ -57,11 +57,11 @@ hr {
 
 .temperature-number {
   margin-left: 3vw;
-  font-size: 23vh;
+  font-size: 20vh;
 }
 
 .temperature-icon {
-  font-size: 25vh;
+  font-size: 22vh;
 }
 
 .temperature-description {
@@ -123,4 +123,32 @@ hr {
 
 .temperature-sub-icon {
   padding-top: 2vh;
+}
+
+
+/* ----------------------------------------------- */
+/* CALENDAR */
+/* ----------------------------------------------- */
+
+.calendar-container {
+  padding-left: 20vw;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.calendar-event {
+  display: flex;
+  align-items: center;
+  padding-bottom: 2vh;
+}
+
+.calendar-event-icon {
+  font-size: 5vh;
+  padding-right: 2vw;
+}
+
+.calendar-event-name {
+  font-size: 3vh;
 }

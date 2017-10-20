@@ -1,6 +1,15 @@
+// weather
 let lat = "39.908702";
 let lon = "-83.114147";
 let darkskyKey = "c98746a2df07c27aa2a80d00f4e659a8";
+
+// calendar
+let calendarClientId = "556674607703-tireknajm8fa3bj03opqs7egoqq7ctu3.apps.googleusercontent.com";
+let calendarDiscoveryDocs = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+let calendarScopes = "https://www.googleapis.com/auth/calendar.readonly";
+let calendarId = "u2tg5n608ntdtifovljih1m4uo@group.calendar.google.com";
+
+// app
 let clockInterval, weatherInterval;
 let subWeatherCreated = false;
 let numOfSubWeathers = 0;
@@ -14,6 +23,140 @@ $(document).ready(() => {
   weatherInterval = setInterval(updateWeather, 900000); // update every 15 minutes
 
 });
+
+/*****************************************************************************
+  CALENDAR
+*****************************************************************************/
+
+// on load, called to load the auth2 library and API client library
+let initCalendar = () => {
+  console.log("initCalendar");
+  gapi.load('client:auth2', initGoogleClient);
+};
+
+// intializes the API client library and sets up sign-in state listeners
+let initGoogleClient = () => {
+  console.log("initGoogleClient");
+  gapi.client.init({
+    discoveryDocs: calendarDiscoveryDocs,
+    clientId: calendarClientId,
+    scope: calendarScopes
+  }).then(function() {
+    // listen for sign-in state changes
+    gapi.auth2.getAuthInstance().isSignedIn.listen(updateGoogleSignInStatus);
+
+    // handle the initial sign-in state
+    updateGoogleSignInStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+  });
+}
+
+// called when the signed in status changes, then signs in
+let updateGoogleSignInStatus = (isSignedIn) => {
+  console.log("updateGoogleSignInStatus");
+  //gapi.auth2.getAuthInstance().signIn();
+  gapi.auth2.getAuthInstance().signIn().then(function() {
+    /*
+    // get calendar list
+
+    let calendarRequest = gapi.client.calendar.calendarList.list();
+    calendarRequest.execute(function(data) {
+      let calendars = data.items;
+    });
+    */
+
+    let today = new Date();
+    let calendarRequest = gapi.client.calendar.events.list({
+      'calendarId' : calendarId,
+      'timeZone': 'America/New_York',
+      'timeMin': today.toISOString(),
+      'singleEvents': true,
+      'orderBy': 'startTime'});
+    calendarRequest.execute(function(data) {
+      console.log("calendar events", data);
+
+      let today = new moment();
+      let eventCount = 0;
+
+      for (let i = 0; i < data.items.length; i++)
+      {
+        let calendarDateMoment;
+        if (data.items[i].start.date) {
+          calendarDateMoment = new moment(data.items[i].start.date);
+        } else {
+          calendarDateMoment = new moment(data.items[i].start.dateTime);
+        }
+        let dayDifference = calendarDateMoment.diff(today, 'days');
+
+        if (dayDifference <= 7 && eventCount < 3) {
+          //console.log(data.items[i].summary + " is happpening " + calendarDateMoment.fromNow());
+          /*
+          <div class='calendar-event'>
+            <i class='calendar-event-icon fa fa-calendar-o' aria-hidden='true'></i>
+            <div class='calendar-event-details'>
+              <div class='calendar-event-name'>Fourth of July</div>
+              <div class='calendar-event-timeframe'>in 10 hours</div>
+            </div>
+          </div>
+          */
+
+          let eventDom = $('<div>', {class: 'calendar-event', id: 'calendar-event-' + i});
+          $('.calendar-container').append(eventDom);
+          let eventIcon = $('<div>', {class: 'calendar-event-icon fa', id: 'calendar-event-icon-' + i});
+          $('#calendar-event-' + i).append(eventIcon);
+          setCalendarIcon('#calendar-event-icon-' + i, data.items[i].summary);
+          let eventDetails = $('<div>', {class: 'calendar-event-details', id: 'calendar-event-details-' + i});
+          $('#calendar-event-' + i).append(eventDetails);
+          let eventName = $('<div>', {class: 'calendar-event-name', id: 'calendar-event-name-' + i});
+          $('#calendar-event-details-' + i).append(eventName);
+          $('#calendar-event-name-' + i).html(data.items[i].summary);
+          let eventTime = $('<div>', {class: 'calendar-event-timeframe', id: 'calendar-event-timeframe-' + i});
+          $('#calendar-event-details-' + i).append(eventTime);
+          $('#calendar-event-timeframe-' + i).html(calendarDateMoment.fromNow());
+
+          eventCount++;
+        }
+
+
+      }
+    });
+
+
+  });
+
+
+
+
+  /*
+  $.ajax({type: 'GET', dataType: 'jsonp', url: "https://www.googleapis.com/calendar/v3/users/me/calendarList", success: function(data, status) {
+    // success
+    console.log("calendar success", data);
+  }, error: function (data, textStatus, errorThrown) {
+
+    // failure
+    console.dir(data);
+    console.warn("Error with Google Calendar API call: " + data.responseText);
+    console.warn("Chrome Error: " + errorThrown.Message);
+  }
+  });
+  */
+
+};
+
+
+let setCalendarIcon = (className, eventName) => {
+
+  // http://fontawesome.io/icons/
+  let eventType = eventName.toLowerCase();
+  if (eventType.includes("birthday") || eventType.includes("bday")) {
+    $(className).addClass("fa-birthday-cake");
+  } else if (eventType.includes("obgyn") || eventType.includes("doctor") || eventType.includes("dr")) {
+    $(className).addClass("fa-stethoscope");
+  } else if (eventType.includes("trip")) {
+    $(className).addClass("fa-plane");
+  } else {
+    $(className).addClass("fa-calendar-o");
+  }
+};
 
 
 /*****************************************************************************
@@ -67,7 +210,7 @@ let updateWeather = () => {
       console.warn("Error with Forecast.IO API call: " + data.responseText);
 			console.warn("Chrome Error: " + errorThrown.Message);
     }
-  })
+  });
 };
 
 let setWeatherIcon = (className, weatherIcon) => {
