@@ -6,17 +6,31 @@
   <link rel='stylesheet' type='text/css' href='styles/index.css'>
   <link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,300italic' rel='stylesheet' type='text/css'>
   <script src='vendor/jquery.min.js'></script>
+  <script src='vendor/moment.min.js'></script>
   <script src='js/index.js'></script>
 
   <title>LeVally Smart Mirror</title>
 </head>
 <body>
-  <div class="row clock-container">
+  <div class='clock-container'>
     <div class='clock'></div>
+    <div class='date'></div>
   </div>
-  <div class="temperature-container">
-    <i class='temperature-icon wi'></i>
-    <div class='temperature-number'></div>
+  <hr>
+  <div class='temperature-container'>
+    <div class='temperature-main'>
+      <i class='temperature-icon wi'></i>
+      <div class='temperature-number'></div>
+    </div>
+    <div class='temperature-extras'>
+      <div class='temperature-high-and-low'></div>
+      <div class='temperature-percipitation-container'>
+        <i class='temperature-percipitation-icon wi'></i>
+        <div class='temperature-percipitation'></div>
+      </div>
+    </div>
+    <div class='temperature-description'></div>
+    <div class='temperature-sub-container'></div>
   </div>
 </body>
 </html>

@@ -2,7 +2,7 @@ html {
   font-family: 'Lato', 'Arial', sans-serif;
   color: #FFFFFF;
   background-color: #000000;
-  font-weight: 300;
+  font-weight: 400;
   font-size: 20px;
   text-rendering: optimizeLegibility;
 }
@@ -10,6 +10,31 @@ html {
 .row {
   max-width: 80%;
   margin: 0 auto;
+}
+
+hr {
+  border: none;
+  border-top: 2px solid;
+  margin: 1em 15%;
+}
+
+
+/* ----------------------------------------------- */
+/* CLOCK */
+/* ----------------------------------------------- */
+.clock-container {
+  font-weight: 300;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.clock {
+  font-size: 5vh;
+}
+
+.date {
 }
 
 
@@ -21,6 +46,13 @@ html {
   padding-top: 3vh;
   display: flex;
   justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.temperature-main {
+  display: flex;
+  justify-content: center;
 }
 
 .temperature-number {
@@ -30,4 +62,54 @@ html {
 
 .temperature-icon {
   font-size: 25vh;
+}
+
+.temperature-description {
+  padding-top: 2vh;
+  font-weight: 300;
+}
+
+.temperature-extras {
+  display: flex;
+  font-size: 3vh;
+  padding-top: 3vh;
+}
+
+.temperature-high-and-low {
+  padding-right: 6vw;
+}
+
+.temperature-percipitation-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.temperature-percipitation-icon {
+  align-self: flex-end;
+  margin-right: 1vh;
+}
+
+.temperature-sub-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 5vh;
+}
+
+.temperature-sub {
+  padding-top: 3vh;
+  padding-left: 1vw;
+  padding-right: 1vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.temperature-sub-day {
+  font-size: 3vh;
+}
+
+.temperature-sub-icon {
+  padding-top: 2vh;
 }
