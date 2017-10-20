@@ -19,6 +19,9 @@ https://css-tricks.com/snippets/css/a-guide-to-flexbox/
 ### weather icons
 https://erikflowers.github.io/weather-icons/
 
+### calendar icons
+http://fontawesome.io/
+
 ### epoch convertror
 https://www.epochconverter.com/
 

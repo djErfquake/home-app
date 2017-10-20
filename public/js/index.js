@@ -7,12 +7,16 @@ let darkskyKey = "c98746a2df07c27aa2a80d00f4e659a8";
 let calendarClientId = "556674607703-tireknajm8fa3bj03opqs7egoqq7ctu3.apps.googleusercontent.com";
 let calendarDiscoveryDocs = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
 let calendarScopes = "https://www.googleapis.com/auth/calendar.readonly";
-let calendarId = "u2tg5n608ntdtifovljih1m4uo@group.calendar.google.com";
+let familyCalendarId = "u2tg5n608ntdtifovljih1m4uo@group.calendar.google.com";
+let holidayCalendarId = "en.usa#holiday@group.v.calendar.google.com";
 
 // app
 let clockInterval, weatherInterval, calendarInterval;
 let subWeatherCreated = false;
 let numOfSubWeathers = 0;
+let calendarEvents = [];
+let calendarsUpdatedCount = 0;
+let eventCount = 0;
 
 $(document).ready(() => {
 
@@ -29,13 +33,11 @@ $(document).ready(() => {
 
 // on load, called to load the auth2 library and API client library
 let initCalendar = () => {
-  console.log("initCalendar");
   gapi.load('client:auth2', initGoogleClient);
 };
 
 // intializes the API client library and sets up sign-in state listeners
 let initGoogleClient = () => {
-  console.log("initGoogleClient");
   gapi.client.init({
     discoveryDocs: calendarDiscoveryDocs,
     clientId: calendarClientId,
@@ -51,26 +53,36 @@ let initGoogleClient = () => {
 
 // called when the signed in status changes, then signs in
 let updateGoogleSignInStatus = (isSignedIn) => {
-  console.log("updateGoogleSignInStatus");
-  //gapi.auth2.getAuthInstance().signIn();
+
   gapi.auth2.getAuthInstance().signIn().then(function() {
+
     /*
     // get calendar list
-
     let calendarRequest = gapi.client.calendar.calendarList.list();
     calendarRequest.execute(function(data) {
       let calendars = data.items;
+      console.log("calendar list", data);
     });
     */
 
-    updateCalendar();
-    calendarInterval = setInterval(updateCalendar, 10800000); // update every 3 hours
+    updateCalendars();
+    calendarInterval = setInterval(updateCalendars, 10800000); // update every 3 hours
 
   });
 
 };
 
-let updateCalendar = () => {
+let updateCalendars = () => {
+  eventCount = 0;
+  calendarsUpdatedCount = 0;
+  $('.calendar-container').html(); // clear calendar
+  calendarEvents = [] // clear array
+
+  updateCalendar(familyCalendarId);
+  updateCalendar(holidayCalendarId);
+};
+
+let updateCalendar = (calendarId) => {
 
   let today = new Date();
   let calendarRequest = gapi.client.calendar.events.list({
@@ -83,11 +95,10 @@ let updateCalendar = () => {
     console.log("calendar events", data);
 
     let today = new moment();
-    let eventCount = 0;
-    $('.calendar-container').html(); // clear calendar
 
     for (let i = 0; i < data.items.length; i++)
     {
+      //console.log("looking at", data.items[i]);
       let calendarDateMoment;
       if (data.items[i].start.date) {
         calendarDateMoment = new moment(data.items[i].start.date);
@@ -96,40 +107,61 @@ let updateCalendar = () => {
       }
       let dayDifference = calendarDateMoment.diff(today, 'days');
 
-      // only show first three and if they are the same week
-      if (dayDifference <= 7 && eventCount < 3) {
-        //console.log(data.items[i].summary + " is happpening " + calendarDateMoment.fromNow());
-        /*
-        <div class='calendar-event'>
-          <i class='calendar-event-icon fa fa-calendar-o' aria-hidden='true'></i>
-          <div class='calendar-event-details'>
-            <div class='calendar-event-name'>Fourth of July</div>
-            <div class='calendar-event-timeframe'>in 10 hours</div>
-          </div>
-        </div>
-        */
+      calendarEvents.push({'event': data.items[i], 'timeUntil': calendarDateMoment, 'fromNow': calendarDateMoment.fromNow()});
+    }
 
-        let eventDom = $('<div>', {class: 'calendar-event', id: 'calendar-event-' + i});
-        $('.calendar-container').append(eventDom);
-        let eventIcon = $('<div>', {class: 'calendar-event-icon fa', id: 'calendar-event-icon-' + i});
-        $('#calendar-event-' + i).append(eventIcon);
-        setCalendarIcon('#calendar-event-icon-' + i, data.items[i].summary);
-        let eventDetails = $('<div>', {class: 'calendar-event-details', id: 'calendar-event-details-' + i});
-        $('#calendar-event-' + i).append(eventDetails);
-        let eventName = $('<div>', {class: 'calendar-event-name', id: 'calendar-event-name-' + i});
-        $('#calendar-event-details-' + i).append(eventName);
-        $('#calendar-event-name-' + i).html(data.items[i].summary);
-        let eventTime = $('<div>', {class: 'calendar-event-timeframe', id: 'calendar-event-timeframe-' + i});
-        $('#calendar-event-details-' + i).append(eventTime);
-        $('#calendar-event-timeframe-' + i).html(calendarDateMoment.fromNow());
+    calendarsUpdatedCount++;
+    if (calendarsUpdatedCount == 2) {// wait for two calendars
 
-        eventCount++;
+      // sort events all together
+      calendarEvents.sort(function(a, b) {
+        return a.timeUntil - b.timeUntil;
+      });
+      console.log("sorted events", calendarEvents);
+
+      // once sorted, only show first three and if they are the same week
+      for (let i = 0; i < calendarEvents.length; i++) {
+
+        let dayDifference = calendarEvents[i].timeUntil.diff(today, 'days');
+        if (dayDifference <= 7 && eventCount < 3) {
+          //console.log(data.items[i].summary + " is happpening " + calendarDateMoment.fromNow());
+          createEvent(calendarEvents[eventCount], eventCount);
+          eventCount++;
+        }
       }
-
     }
   });
 
 };
+
+let createEvent = (eventInfo, index) => {
+  /*
+  <div class='calendar-event'>
+    <i class='calendar-event-icon fa fa-calendar-o' aria-hidden='true'></i>
+    <div class='calendar-event-details'>
+      <div class='calendar-event-name'>Fourth of July</div>
+      <div class='calendar-event-timeframe'>in 10 hours</div>
+    </div>
+  </div>
+  */
+  let eventDom = $('<div>', {class: 'calendar-event', id: 'calendar-event-' + index});
+  $('.calendar-container').append(eventDom);
+  let eventIcon = $('<div>', {class: 'calendar-event-icon fa', id: 'calendar-event-icon-' + index});
+  $('#calendar-event-' + index).append(eventIcon);
+  setCalendarIcon('#calendar-event-icon-' + index, eventInfo.event.summary);
+  let eventDetails = $('<div>', {class: 'calendar-event-details', id: 'calendar-event-details-' + index});
+  $('#calendar-event-' + index).append(eventDetails);
+  let eventName = $('<div>', {class: 'calendar-event-name', id: 'calendar-event-name-' + index});
+  $('#calendar-event-details-' + index).append(eventName);
+  $('#calendar-event-name-' + index).html(eventInfo.event.summary);
+  let eventTime = $('<div>', {class: 'calendar-event-timeframe', id: 'calendar-event-timeframe-' + index});
+  $('#calendar-event-details-' + index).append(eventTime);
+  let eventTimeFrame = eventInfo.fromNow;
+  if (eventTimeFrame.includes("ago")) {
+    eventTimeFrame = "Today";
+  }
+  $('#calendar-event-timeframe-' + index).html(eventTimeFrame);
+}
 
 
 let setCalendarIcon = (className, eventName) => {
@@ -142,9 +174,29 @@ let setCalendarIcon = (className, eventName) => {
     $(className).addClass("fa-stethoscope");
   } else if (eventType.includes("trip")) {
     $(className).addClass("fa-plane");
+  } else if (eventType.includes("star wars")) {
+    $(className).addClass("fa-rebel");
+  } else if (eventType.includes("anniversary")) {
+    $(className).addClass("fa-heart");
+  } else if (eventType.includes("soccer")) {
+    $(className).addClass("fa-futbol-o");
+  } else if (eventType.includes("christmas") || eventType.includes("holiday") || eventType.includes("xmas")) {
+    $(className).addClass("fa-tree");
+  } else if (eventType.includes("dinner") || eventType.includes("lunch")) {
+    $(className).addClass("fa-cutlery");
+  } else if (eventType.includes("beer")) {
+    $(className).addClass("fa-beer");
+  } else if (eventType.includes("movie")) {
+    $(className).addClass("fa-film");
+  } else if (eventType.includes("dark week")) {
+    $(className).addClass("fa-calendar-times-o");
+  } else if (eventType.includes("vet") || eventType.includes("darcy") || eventType.includes("puppy") || eventType.includes("dog")) {
+    $(className).addClass("fa-paw");
   } else {
     $(className).addClass("fa-calendar-o");
   }
+
+
 };
 
 
@@ -325,6 +377,6 @@ let updateClock = () => {
 
   let m = new moment();
   $('.clock').html(m.format('h:mm A'));
-  $('.date').html(m.format('dddd MMMM do YYYY'));
+  $('.date').html(m.format('dddd MMMM Do YYYY'));
 
 };
