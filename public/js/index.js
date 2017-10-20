@@ -10,7 +10,7 @@ let calendarScopes = "https://www.googleapis.com/auth/calendar.readonly";
 let calendarId = "u2tg5n608ntdtifovljih1m4uo@group.calendar.google.com";
 
 // app
-let clockInterval, weatherInterval;
+let clockInterval, weatherInterval, calendarInterval;
 let subWeatherCreated = false;
 let numOfSubWeathers = 0;
 
@@ -21,7 +21,6 @@ $(document).ready(() => {
 
   updateWeather();
   weatherInterval = setInterval(updateWeather, 900000); // update every 15 minutes
-
 });
 
 /*****************************************************************************
@@ -64,81 +63,71 @@ let updateGoogleSignInStatus = (isSignedIn) => {
     });
     */
 
-    let today = new Date();
-    let calendarRequest = gapi.client.calendar.events.list({
-      'calendarId' : calendarId,
-      'timeZone': 'America/New_York',
-      'timeMin': today.toISOString(),
-      'singleEvents': true,
-      'orderBy': 'startTime'});
-    calendarRequest.execute(function(data) {
-      console.log("calendar events", data);
+    updateCalendar();
+    calendarInterval = setInterval(updateCalendar, 10800000); // update every 3 hours
 
-      let today = new moment();
-      let eventCount = 0;
+  });
 
-      for (let i = 0; i < data.items.length; i++)
-      {
-        let calendarDateMoment;
-        if (data.items[i].start.date) {
-          calendarDateMoment = new moment(data.items[i].start.date);
-        } else {
-          calendarDateMoment = new moment(data.items[i].start.dateTime);
-        }
-        let dayDifference = calendarDateMoment.diff(today, 'days');
+};
 
-        if (dayDifference <= 7 && eventCount < 3) {
-          //console.log(data.items[i].summary + " is happpening " + calendarDateMoment.fromNow());
-          /*
-          <div class='calendar-event'>
-            <i class='calendar-event-icon fa fa-calendar-o' aria-hidden='true'></i>
-            <div class='calendar-event-details'>
-              <div class='calendar-event-name'>Fourth of July</div>
-              <div class='calendar-event-timeframe'>in 10 hours</div>
-            </div>
-          </div>
-          */
+let updateCalendar = () => {
 
-          let eventDom = $('<div>', {class: 'calendar-event', id: 'calendar-event-' + i});
-          $('.calendar-container').append(eventDom);
-          let eventIcon = $('<div>', {class: 'calendar-event-icon fa', id: 'calendar-event-icon-' + i});
-          $('#calendar-event-' + i).append(eventIcon);
-          setCalendarIcon('#calendar-event-icon-' + i, data.items[i].summary);
-          let eventDetails = $('<div>', {class: 'calendar-event-details', id: 'calendar-event-details-' + i});
-          $('#calendar-event-' + i).append(eventDetails);
-          let eventName = $('<div>', {class: 'calendar-event-name', id: 'calendar-event-name-' + i});
-          $('#calendar-event-details-' + i).append(eventName);
-          $('#calendar-event-name-' + i).html(data.items[i].summary);
-          let eventTime = $('<div>', {class: 'calendar-event-timeframe', id: 'calendar-event-timeframe-' + i});
-          $('#calendar-event-details-' + i).append(eventTime);
-          $('#calendar-event-timeframe-' + i).html(calendarDateMoment.fromNow());
+  let today = new Date();
+  let calendarRequest = gapi.client.calendar.events.list({
+    'calendarId' : calendarId,
+    'timeZone': 'America/New_York',
+    'timeMin': today.toISOString(),
+    'singleEvents': true,
+    'orderBy': 'startTime'});
+  calendarRequest.execute(function(data) {
+    console.log("calendar events", data);
 
-          eventCount++;
-        }
+    let today = new moment();
+    let eventCount = 0;
+    $('.calendar-container').html(); // clear calendar
 
-
+    for (let i = 0; i < data.items.length; i++)
+    {
+      let calendarDateMoment;
+      if (data.items[i].start.date) {
+        calendarDateMoment = new moment(data.items[i].start.date);
+      } else {
+        calendarDateMoment = new moment(data.items[i].start.dateTime);
       }
-    });
+      let dayDifference = calendarDateMoment.diff(today, 'days');
 
+      // only show first three and if they are the same week
+      if (dayDifference <= 7 && eventCount < 3) {
+        //console.log(data.items[i].summary + " is happpening " + calendarDateMoment.fromNow());
+        /*
+        <div class='calendar-event'>
+          <i class='calendar-event-icon fa fa-calendar-o' aria-hidden='true'></i>
+          <div class='calendar-event-details'>
+            <div class='calendar-event-name'>Fourth of July</div>
+            <div class='calendar-event-timeframe'>in 10 hours</div>
+          </div>
+        </div>
+        */
 
+        let eventDom = $('<div>', {class: 'calendar-event', id: 'calendar-event-' + i});
+        $('.calendar-container').append(eventDom);
+        let eventIcon = $('<div>', {class: 'calendar-event-icon fa', id: 'calendar-event-icon-' + i});
+        $('#calendar-event-' + i).append(eventIcon);
+        setCalendarIcon('#calendar-event-icon-' + i, data.items[i].summary);
+        let eventDetails = $('<div>', {class: 'calendar-event-details', id: 'calendar-event-details-' + i});
+        $('#calendar-event-' + i).append(eventDetails);
+        let eventName = $('<div>', {class: 'calendar-event-name', id: 'calendar-event-name-' + i});
+        $('#calendar-event-details-' + i).append(eventName);
+        $('#calendar-event-name-' + i).html(data.items[i].summary);
+        let eventTime = $('<div>', {class: 'calendar-event-timeframe', id: 'calendar-event-timeframe-' + i});
+        $('#calendar-event-details-' + i).append(eventTime);
+        $('#calendar-event-timeframe-' + i).html(calendarDateMoment.fromNow());
+
+        eventCount++;
+      }
+
+    }
   });
-
-
-
-
-  /*
-  $.ajax({type: 'GET', dataType: 'jsonp', url: "https://www.googleapis.com/calendar/v3/users/me/calendarList", success: function(data, status) {
-    // success
-    console.log("calendar success", data);
-  }, error: function (data, textStatus, errorThrown) {
-
-    // failure
-    console.dir(data);
-    console.warn("Error with Google Calendar API call: " + data.responseText);
-    console.warn("Chrome Error: " + errorThrown.Message);
-  }
-  });
-  */
 
 };
 
