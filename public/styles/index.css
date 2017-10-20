@@ -79,6 +79,17 @@ hr {
   padding-right: 6vw;
 }
 
+.temperature-percipitation-time-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-right: 6vw;
+}
+
+.temperature-percipitation-time-icon {
+  margin-right: 1vh;
+}
+
 .temperature-percipitation-container {
   display: flex;
   justify-content: center;

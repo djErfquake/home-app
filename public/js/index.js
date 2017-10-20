@@ -34,7 +34,27 @@ let updateWeather = () => {
       // extras
       $('.temperature-high-and-low').html(Math.round(data.daily.data[0].apparentTemperatureHigh) + "°/" + Math.round(data.daily.data[0].apparentTemperatureLow) + "°");
       setPercipitationIcon('.temperature-percipitation-icon', data.daily.data[0].precipType);
-      $('.temperature-percipitation').html(data.daily.data[0].precipProbability + "%");
+      $('.temperature-percipitation').html((data.daily.data[0].precipProbability * 100) + "%");
+
+      // check for percipitation
+      let willRain = false;
+      let rainTime = 0;
+      for (let i = 0; i < data.hourly.data.length; i++) {
+        if (data.hourly.data[0].precipType == "rain" && data.hourly.data[i].precipProbability > 0.4) {
+          rainTime = data.hourly.data[i].time;
+          willRain = true;
+          break;
+        }
+      }
+
+      if (willRain) {
+        $('.temperature-percipitation-time-container').show();
+        let rainMoment = moment.unix(rainTime);
+        $('.temperature-percipitation-time').html(rainMoment.format('h a'));
+      } else {
+        $('.temperature-percipitation-time-container').hide();
+        $('.temperature-percipitation-time').html();
+      }
 
       // sub weather
       if (!subWeatherCreated) { createSubWeather(data.daily.data.length - 1); }
