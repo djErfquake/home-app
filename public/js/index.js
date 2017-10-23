@@ -25,7 +25,13 @@ $(document).ready(() => {
 
   updateWeather();
   weatherInterval = setInterval(updateWeather, 900000); // update every 15 minutes
+
+  $('.temperature-icon').click(function() { temperatureIconClicked(); });
 });
+
+let temperatureIconClicked = () => {
+
+};
 
 /*****************************************************************************
   CALENDAR
@@ -96,7 +102,7 @@ let updateCalendar = (calendarId) => {
 
     let today = new moment();
 
-    for (let i = 0; i < data.items.length; i++)
+    for (let i = 0; i < 5; i++)
     {
       //console.log("looking at", data.items[i]);
       let calendarDateMoment;
@@ -107,6 +113,7 @@ let updateCalendar = (calendarId) => {
       }
       let dayDifference = calendarDateMoment.diff(today, 'days');
 
+      //console.log(data.items[i].summary + " is happpening at " + calendarDateMoment.format('MMMM Do YYYY, h:mm:ss a'));
       calendarEvents.push({'event': data.items[i], 'timeUntil': calendarDateMoment, 'fromNow': calendarDateMoment.fromNow()});
     }
 
@@ -125,6 +132,7 @@ let updateCalendar = (calendarId) => {
         let dayDifference = calendarEvents[i].timeUntil.diff(today, 'days');
         if (dayDifference <= 7 && eventCount < 3) {
           //console.log(data.items[i].summary + " is happpening " + calendarDateMoment.fromNow());
+
           createEvent(calendarEvents[eventCount], eventCount);
           eventCount++;
         }
@@ -144,6 +152,7 @@ let createEvent = (eventInfo, index) => {
     </div>
   </div>
   */
+
   let eventDom = $('<div>', {class: 'calendar-event', id: 'calendar-event-' + index});
   $('.calendar-container').append(eventDom);
   let eventIcon = $('<div>', {class: 'calendar-event-icon fa', id: 'calendar-event-icon-' + index});
@@ -156,10 +165,32 @@ let createEvent = (eventInfo, index) => {
   $('#calendar-event-name-' + index).html(eventInfo.event.summary);
   let eventTime = $('<div>', {class: 'calendar-event-timeframe', id: 'calendar-event-timeframe-' + index});
   $('#calendar-event-details-' + index).append(eventTime);
+
+  // is today?
   let eventTimeFrame = eventInfo.fromNow;
   if (eventTimeFrame.includes("ago")) {
     eventTimeFrame = "Today";
+
+    // multiple day
+    let endDate;
+    if (eventInfo.event.end.date) {
+      endDate = new moment(eventInfo.event.end.date);
+    } else {
+      endDate = new moment(eventInfo.event.end.dateTime);
+    }
+
+    let eventDuration = endDate.diff(eventInfo.timeUntil, 'days');
+    console.log(eventInfo.event.summary, eventDuration);
+    if (eventDuration > 1) {
+      //eventTimeFrame += " for " + eventDuration;
+      eventTimeFrame += ", for " + eventDuration + " days";
+    }
   }
+
+
+
+
+
   $('#calendar-event-timeframe-' + index).html(eventTimeFrame);
 }
 
@@ -170,28 +201,40 @@ let setCalendarIcon = (className, eventName) => {
   let eventType = eventName.toLowerCase();
   if (eventType.includes("birthday") || eventType.includes("bday")) {
     $(className).addClass("fa-birthday-cake");
-  } else if (eventType.includes("obgyn") || eventType.includes("doctor") || eventType.includes("dr")) {
-    $(className).addClass("fa-stethoscope");
   } else if (eventType.includes("trip")) {
     $(className).addClass("fa-plane");
   } else if (eventType.includes("star wars")) {
     $(className).addClass("fa-rebel");
-  } else if (eventType.includes("anniversary")) {
+  } else if (eventType.includes("anniversary") || eventType.includes("valentine")) {
     $(className).addClass("fa-heart");
-  } else if (eventType.includes("soccer")) {
+  } else if (eventType.includes("halloween") || eventType.includes("trick or treat")) {
+    $(className).addClass("fa-snapchat-ghost");
+  } else if (eventType.includes("soccer") || eventType.includes("crew")) {
     $(className).addClass("fa-futbol-o");
+  } else if (eventType.includes("basketball")) {
+    $(className).addClass("fa-dribbble");
   } else if (eventType.includes("christmas") || eventType.includes("holiday") || eventType.includes("xmas")) {
     $(className).addClass("fa-tree");
   } else if (eventType.includes("dinner") || eventType.includes("lunch")) {
     $(className).addClass("fa-cutlery");
-  } else if (eventType.includes("beer")) {
+  } else if (eventType.includes("beer") || eventType.includes("drinks")) {
     $(className).addClass("fa-beer");
+  } else if (eventType.includes("shower")) {
+    $(className).addClass("fa-gift");
   } else if (eventType.includes("movie")) {
     $(className).addClass("fa-film");
+  } else if (eventType.includes("daylight saving")) {
+    $(className).addClass("fa-clock-o");
   } else if (eventType.includes("dark week")) {
     $(className).addClass("fa-calendar-times-o");
-  } else if (eventType.includes("vet") || eventType.includes("darcy") || eventType.includes("puppy") || eventType.includes("dog")) {
+  } else if ((eventType.includes("vet") && !eventType.includes("veterans")) || eventType.includes("darcy") || eventType.includes("puppy") || eventType.includes("dog")) {
     $(className).addClass("fa-paw");
+  } else if (eventType.includes("thea") || (eventType.includes("baby"))) {
+    $(className).addClass("fa-child");
+  } else if (eventType.includes("book") || (eventType.includes("bible"))) {
+    $(className).addClass("fa-book");
+  } else if (eventType.includes("obgyn") || eventType.includes("doctor") || eventType.includes("dr")) {
+    $(className).addClass("fa-stethoscope");
   } else {
     $(className).addClass("fa-calendar-o");
   }
@@ -224,8 +267,12 @@ let updateWeather = () => {
       let willRain = false;
       let rainTime = 0;
       for (let i = 0; i < data.hourly.data.length; i++) {
-        if (data.hourly.data[0].precipType == "rain" && data.hourly.data[i].precipProbability > 0.4) {
-          rainTime = data.hourly.data[i].time;
+        if (data.hourly.data[i].precipType == "rain" && data.hourly.data[i].precipProbability > 0.4) {
+          if (i > 0) {
+            rainTime = rainTime = data.hourly.data[i - 1].time;
+          } else {
+            rainTime = data.hourly.data[i].time;
+          }
           willRain = true;
           break;
         }
