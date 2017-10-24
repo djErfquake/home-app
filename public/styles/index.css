@@ -61,7 +61,7 @@ hr {
 }
 
 .temperature-icon {
-  font-size: 22vh;
+  font-size: 20vh;
 }
 
 .temperature-description {
@@ -141,8 +141,12 @@ hr {
 .calendar-event {
   display: flex;
   align-items: center;
+}
+
+.calendar-event:not(:last-child) {
   padding-bottom: 2vh;
 }
+
 
 .calendar-event-icon {
   font-size: 5vh;

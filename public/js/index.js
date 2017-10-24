@@ -81,7 +81,7 @@ let updateGoogleSignInStatus = (isSignedIn) => {
 let updateCalendars = () => {
   eventCount = 0;
   calendarsUpdatedCount = 0;
-  $('.calendar-container').html(); // clear calendar
+  $('.calendar-container').html(""); // clear calendar
   calendarEvents = [] // clear array
 
   updateCalendar(familyCalendarId);
