@@ -37,6 +37,21 @@ hr {
 .date {
 }
 
+.traffic {
+  display: flex;
+  font-weight: 400;
+  justify-content: space-around;
+  width: 80%;
+}
+
+.traffic-calvin {
+  font-size: 3vh;
+}
+
+.traffic-carolyn {
+  font-size: 3vh;
+}
+
 
 /* ----------------------------------------------- */
 /* WEATHER */

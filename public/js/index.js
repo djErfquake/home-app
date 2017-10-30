@@ -33,6 +33,94 @@ let temperatureIconClicked = () => {
 
 };
 
+
+
+/*****************************************************************************
+  TRAFFIC
+*****************************************************************************/
+let updateTraffic = () => {
+
+  let m = new moment();
+  let hour = m.hour();
+  let day = m.day();
+
+  // weekday
+  if (day >= 1 && day <= 5 && hour >= 6 && hour <= 9) {
+
+    console.log("updating traffic to work");
+    let googleDirections = new google.maps.DirectionsService();
+
+    // time to calvin's work
+    googleDirections.route({
+      origin: "4419 Tolbert Ave Grove City, OH 43123",
+      destination: "7001 Discovery Blvd Dublin, OH 43017",
+      travelMode: "DRIVING"
+    }, function(response, status) {
+      if (status === 'OK') {
+        console.log("calvin's maps response", response);
+        $('.traffic-calvin').html("Time to Roto: " + response.routes[0].legs[0].duration.text);
+
+        if (response.routes[0].warnings.length > 0) {
+          $('.traffic-calvin').append(response.routes[0].warnings[0].text);
+        }
+
+      } else {
+        window.alert('Directions request failed due to ' + status);
+      }
+    });
+
+    // time to carolyn's work
+    googleDirections.route({
+      origin: "4419 Tolbert Ave Grove City, OH 43123",
+      destination: "236 E Town St, Columbus, OH 43215",
+      travelMode: "DRIVING"
+    }, function(response, status) {
+      if (status === 'OK') {
+        console.log("carolyn's maps response", response);
+        $('.traffic-carolyn').html("Time to Franklin: " + response.routes[0].legs[0].duration.text);
+
+        if (response.routes[0].warnings.length > 0) {
+          $('.traffic-carolyn').append(response.routes[0].warnings[0].text);
+        }
+
+      } else {
+        window.alert('Directions request failed due to ' + status);
+      }
+    });
+
+  } else if (day == 0 && hour >= 7 && hour <= 11) { // sunday
+
+    console.log("updating traffic to church");
+    let googleDirections = new google.maps.DirectionsService();
+
+    // time to church
+    googleDirections.route({
+      origin: "4419 Tolbert Ave Grove City, OH 43123",
+      destination: "1650 Ridgeview Rd, Upper Arlington, OH 43221",
+      travelMode: "DRIVING"
+    }, function(response, status) {
+      if (status === 'OK') {
+        console.log("church maps response", response);
+        $('.traffic-calvin').html("Time to Church: " + response.routes[0].legs[0].duration.text);
+
+        if (response.routes[0].warnings.length > 0) {
+          $('.traffic-calvin').append(response.routes[0].warnings[0].text);
+        }
+
+      } else {
+        window.alert('Directions request failed due to ' + status);
+      }
+    });
+
+  }
+
+
+
+
+
+};
+
+
 /*****************************************************************************
   CALENDAR
 *****************************************************************************/
@@ -186,10 +274,6 @@ let createEvent = (eventInfo, index) => {
       eventTimeFrame += ", for " + eventDuration + " days";
     }
   }
-
-
-
-
 
   $('#calendar-event-timeframe-' + index).html(eventTimeFrame);
 }

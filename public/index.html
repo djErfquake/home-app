@@ -4,16 +4,21 @@
   <link rel='stylesheet' type='text/css' href='vendor/css/ungrid.min.css'>
   <link rel='stylesheet' type='text/css' href='vendor/css/weather-icons.min.css'>
   <link rel='stylesheet' type='text/css' href='vendor/css/font-awesome.min.css'>
-<link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,300italic' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,300italic' rel='stylesheet' type='text/css'>
   <link rel='stylesheet' type='text/css' href='styles/index.css'>
 
 
   <script src='vendor/jquery.min.js'></script>
   <script src='vendor/moment.min.js'></script>
+  <!--<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script> -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDrJ_2S9m-lZ5jmBPHteOGVc55b4Suqirc"
+    onload="this.onload=function(){};updateTraffic()"
+    onreadystatechange="if (this.readyState === 'complete') this.onload()">
+  </script>
   <script async defer src="https://apis.google.com/js/api.js"
-      onload="this.onload=function(){};initCalendar()"
-      onreadystatechange="if (this.readyState === 'complete') this.onload()">
-    </script>
+    onload="this.onload=function(){};initCalendar()"
+    onreadystatechange="if (this.readyState === 'complete') this.onload()">
+  </script>
   <script src='js/index.js'></script>
 
   <title>LeVally Smart Mirror</title>
@@ -22,6 +27,10 @@
   <div class='clock-container'>
     <div class='clock'></div>
     <div class='date'></div>
+    <div class='traffic'>
+      <div class='traffic-calvin'></div>
+      <div class='traffic-carolyn'></div>
+    </div>
   </div>
   <hr>
   <div class='temperature-container'>
