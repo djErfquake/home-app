@@ -11,7 +11,7 @@ let familyCalendarId = "u2tg5n608ntdtifovljih1m4uo@group.calendar.google.com";
 let holidayCalendarId = "en.usa#holiday@group.v.calendar.google.com";
 
 // app
-let clockInterval, weatherInterval, calendarInterval;
+let clockInterval, weatherInterval, calendarInterval, trafficInterval;
 let subWeatherCreated = false;
 let numOfSubWeathers = 0;
 let calendarEvents = [];
@@ -38,6 +38,11 @@ let temperatureIconClicked = () => {
 /*****************************************************************************
   TRAFFIC
 *****************************************************************************/
+let mapsApiLoaded = () => {
+  updateTraffic();
+  trafficInterval = setInterval(updateTraffic, 180000); // update every 3 minutes
+};
+
 let updateTraffic = () => {
 
   let m = new moment();
