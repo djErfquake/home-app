@@ -45,6 +45,8 @@ let mapsApiLoaded = () => {
 
 let updateTraffic = () => {
 
+  let calvinTraffic = "", carolynTraffic = "";
+
   let m = new moment();
   let hour = m.hour();
   let day = m.day();
@@ -63,10 +65,10 @@ let updateTraffic = () => {
     }, function(response, status) {
       if (status === 'OK') {
         console.log("calvin's maps response", response);
-        $('.traffic-calvin').html("Time to Roto: " + response.routes[0].legs[0].duration.text);
+        calvinTraffic = "Time to Roto: " + response.routes[0].legs[0].duration.text;
 
         if (response.routes[0].warnings.length > 0) {
-          $('.traffic-calvin').append(response.routes[0].warnings[0].text);
+          calvinTraffic += response.routes[0].warnings[0].text;
         }
 
       } else {
@@ -82,10 +84,10 @@ let updateTraffic = () => {
     }, function(response, status) {
       if (status === 'OK') {
         console.log("carolyn's maps response", response);
-        $('.traffic-carolyn').html("Time to Franklin: " + response.routes[0].legs[0].duration.text);
+        carolynTraffic  = "Time to Franklin: " + response.routes[0].legs[0].duration.text;
 
         if (response.routes[0].warnings.length > 0) {
-          $('.traffic-carolyn').append(response.routes[0].warnings[0].text);
+          carolynTraffic += response.routes[0].warnings[0].text;
         }
 
       } else {
@@ -106,10 +108,10 @@ let updateTraffic = () => {
     }, function(response, status) {
       if (status === 'OK') {
         console.log("church maps response", response);
-        $('.traffic-calvin').html("Time to Church: " + response.routes[0].legs[0].duration.text);
+        calvinTraffic = "Time to Church: " + response.routes[0].legs[0].duration.text;
 
         if (response.routes[0].warnings.length > 0) {
-          $('.traffic-calvin').append(response.routes[0].warnings[0].text);
+          calvinTraffic += response.routes[0].warnings[0].text;
         }
 
       } else {
@@ -120,7 +122,8 @@ let updateTraffic = () => {
   }
 
 
-
+  $('.traffic-calvin').html(calvinTraffic);
+  $('.traffic-carolyn').html(carolynTraffic);
 
 
 };
