@@ -353,7 +353,7 @@ let updateWeather = () => {
       // extras
       $('.temperature-high-and-low').html(Math.round(data.daily.data[0].apparentTemperatureHigh) + "°/" + Math.round(data.daily.data[0].apparentTemperatureLow) + "°");
       setPercipitationIcon('.temperature-percipitation-icon', data.daily.data[0].precipType);
-      $('.temperature-percipitation').html((data.daily.data[0].precipProbability * 100) + "%");
+      $('.temperature-percipitation').html(Math.round(data.daily.data[0].precipProbability * 100) + "%");
 
       // check for percipitation
       let willRain = false;
